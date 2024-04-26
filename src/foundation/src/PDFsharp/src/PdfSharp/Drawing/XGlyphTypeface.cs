@@ -459,16 +459,14 @@ namespace PdfSharp.Drawing
                 };
             }
 
-            familyName = familyName.ToLowerInvariant();
-            var name = familyName.ToLowerInvariant();
             var bold = fontResolvingOptions.IsBold;
             var italic = fontResolvingOptions.IsItalic;
             var key = bold switch
             {
-                false when !italic => name + "/N/400/500" + simulationSuffix + KeySuffix,
-                true when !italic => name + "/N/700/500" + simulationSuffix + KeySuffix,
-                false when italic => name + "/I/400/500" + simulationSuffix + KeySuffix,
-                _ => name + "/I/700/5" + simulationSuffix + KeySuffix,
+                false when !italic => $"{familyName}/N/400/500{simulationSuffix}{KeySuffix}",
+                true when !italic => $"{familyName}/N/700/500{simulationSuffix}{KeySuffix}",
+                false when italic => $"{familyName}/I/400/500{simulationSuffix}{KeySuffix}",
+                _ => $"{familyName}/I/700/5{simulationSuffix}{KeySuffix}",
             };
             return key;
         }

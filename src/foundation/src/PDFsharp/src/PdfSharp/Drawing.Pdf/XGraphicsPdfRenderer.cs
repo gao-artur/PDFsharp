@@ -43,7 +43,8 @@ namespace PdfSharp.Drawing.Pdf
             _colorMode = page._document.Options.ColorMode;
             _options = options;
             _gfx = gfx;
-            _content = new StringBuilder();
+            _stringBuilderHolder = StringBuilderProvider.Acquire();
+            _content = _stringBuilderHolder.StringBuilder;
             page.RenderContent!._pdfRenderer = this; // NRT
             _gfxState = new PdfGraphicsState(this);
         }
@@ -53,7 +54,8 @@ namespace PdfSharp.Drawing.Pdf
             _form = form;
             _colorMode = form.Owner.Options.ColorMode;
             _gfx = gfx;
-            _content = new StringBuilder();
+            _stringBuilderHolder = StringBuilderProvider.Acquire();
+            _content = _stringBuilderHolder.StringBuilder;
             form.PdfRenderer = this;
             _gfxState = new PdfGraphicsState(this);
         }
@@ -61,10 +63,10 @@ namespace PdfSharp.Drawing.Pdf
         /// <summary>
         /// Gets the content created by this renderer.
         /// </summary>
-        string GetContent()
+        byte[] GetContentBytes()
         {
             EndPage();
-            return _content.ToString();
+            return PdfEncoders.RawEncoding.GetBytes(_content);
         }
 
         public XGraphicsPdfPageOptions PageOptions => _options;
@@ -74,7 +76,7 @@ namespace PdfSharp.Drawing.Pdf
             if (_page != null!)
             {
                 var content2 = _page.RenderContent!; // NRT
-                content2.CreateStream(PdfEncoders.RawEncoding.GetBytes(GetContent()));
+                content2.CreateStream(GetContentBytes());
 
                 _gfx = default!;
                 _page.RenderContent!._pdfRenderer = default!;
@@ -83,11 +85,13 @@ namespace PdfSharp.Drawing.Pdf
             }
             else if (_form != null!)
             {
-                _form._pdfForm!.CreateStream(PdfEncoders.RawEncoding.GetBytes(GetContent())); // NRT
+                _form._pdfForm!.CreateStream(GetContentBytes()); // NRT
                 _gfx = default!;
                 _form.PdfRenderer = default!;
                 _form = default!;
             }
+
+            _stringBuilderHolder.Dispose();
         }
 
         // --------------------------------------------------------------------------------------------
@@ -2300,5 +2304,7 @@ namespace PdfSharp.Drawing.Pdf
         /// The final transformation from the world space to the default page space.
         /// </summary>
         public XMatrix DefaultViewMatrix;
+
+        private readonly StringBuilderHolder _stringBuilderHolder;
     }
 }

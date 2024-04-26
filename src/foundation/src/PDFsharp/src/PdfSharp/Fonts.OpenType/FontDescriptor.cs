@@ -216,7 +216,6 @@ namespace PdfSharp.Fonts.OpenType
 
         internal static string ComputeFdKey(string name, bool isBold, bool isItalic)
         {
-            name = name.ToLowerInvariant();
             var key = isBold switch
             {
                 false when !isItalic => name + '/',

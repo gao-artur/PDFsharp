@@ -1,7 +1,7 @@
 ﻿// MigraDoc - Creating Documents on the Fly
 // See the LICENSE file in the solution root for more information.
 
-using System.Text;
+using PdfSharp.Internal;
 
 namespace MigraDoc.DocumentObjectModel.Visitors
 {
@@ -86,9 +86,9 @@ namespace MigraDoc.DocumentObjectModel.Visitors
             }
 
             int[] indices = textIndices.ToArray();
-
             int insertedObjects = 0;
-            var currentString = new StringBuilder();
+            using var holder = StringBuilderProvider.Acquire();
+            var currentString = holder.StringBuilder;
             foreach (int idx in indices)
             {
                 Text? text = elements[idx + insertedObjects] as Text;

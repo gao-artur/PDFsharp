@@ -7,6 +7,7 @@ using System.Globalization;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using PdfSharp.Drawing;
+using PdfSharp.Internal;
 using PdfSharp.Logging;
 using PdfSharp.Pdf.Security;
 
@@ -22,8 +23,8 @@ namespace PdfSharp.Pdf.Internal
         /// <summary>
         /// Gets the raw encoding.
         /// </summary>
-        public static Encoding RawEncoding => _rawEncoding ??= new RawEncoding();
-        static Encoding? _rawEncoding;
+        public static RawEncoding RawEncoding => _rawEncoding ??= new RawEncoding();
+        static RawEncoding? _rawEncoding;
 
         /// <summary>
         /// Gets the raw Unicode encoding.
@@ -249,6 +250,9 @@ namespace PdfSharp.Pdf.Internal
             return RawEncoding.GetString(agTemp, 0, agTemp.Length);
         }
 
+        private static readonly byte[] FormatStringLiteral1 = [(byte)'<', (byte)'>'];
+        private static readonly byte[] FormatStringLiteral2 = [(byte)'(', (byte)')'];
+
         /// <summary>
         /// Converts the specified byte array into a byte array representing a string literal.
         /// </summary>
@@ -261,7 +265,9 @@ namespace PdfSharp.Pdf.Internal
         public static byte[] FormatStringLiteral(byte[]? bytes, bool unicode, bool prefix, bool hex, PdfStandardSecurityHandler? securityHandler)
         {
             if (bytes == null || bytes.Length == 0)
-                return hex ? [(byte)'<', (byte)'>'] : [(byte)'(', (byte)')'];
+            {
+                return hex ? FormatStringLiteral1 : FormatStringLiteral2;
+            }
 
             Debug.Assert(!unicode || bytes.Length % 2 == 0, "Odd number of bytes in Unicode string.");
 
@@ -286,7 +292,9 @@ namespace PdfSharp.Pdf.Internal
             }
 
             var count = bytes.Length;
-            var pdf = new StringBuilder();
+
+            using var holder = StringBuilderProvider.Acquire();
+            var pdf = holder.StringBuilder;
             if (!unicode)
             {
                 // Case: ANSI
@@ -387,7 +395,8 @@ namespace PdfSharp.Pdf.Internal
                 }
                 pdf.Append('>');
             }
-            return RawEncoding.GetBytes(pdf.ToString());
+
+            return RawEncoding.GetBytes(pdf);
         }
 
         /// <summary>

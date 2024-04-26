@@ -122,6 +122,7 @@ namespace MigraDoc.Rendering
         /// <returns>The fitting Renderer.</returns>
         internal static Renderer? Create(XGraphics gfx, DocumentRenderer documentRenderer, DocumentObject documentObject, FieldInfos? fieldInfos)
         {
+            // TODO: create pool
             Renderer? renderer = null;
             if (documentObject is Paragraph paragraph)
                 renderer = new ParagraphRenderer(gfx, paragraph, fieldInfos);
@@ -156,6 +157,7 @@ namespace MigraDoc.Rendering
         /// <returns>The fitting Renderer.</returns>
         internal static Renderer Create(XGraphics gfx, DocumentRenderer documentRenderer, RenderInfo renderInfo, FieldInfos? fieldInfos)
         {
+            // TODO: create pool
             Renderer? renderer = null;
 
             if (renderInfo.DocumentObject is Paragraph)

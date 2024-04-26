@@ -65,6 +65,6 @@ namespace PdfSharp.Internal
         /// <summary>
         /// Maps typeface key to glyph typeface.
         /// </summary>
-        public readonly Dictionary<string, XGlyphTypeface> GlyphTypefacesByKey = [];
+        public readonly Dictionary<string, XGlyphTypeface> GlyphTypefacesByKey = new(StringComparer.InvariantCultureIgnoreCase);
     }
 }

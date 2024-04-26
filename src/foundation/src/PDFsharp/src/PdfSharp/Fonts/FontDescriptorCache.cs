@@ -68,7 +68,7 @@ namespace PdfSharp.Fonts
                 throw new ArgumentNullException(nameof(fontFamilyName));
 
             //FontSelector1 selector = new FontSelector1(fontFamilyName, style);
-            string fontDescriptorKey = FontDescriptor.ComputeFdKey(fontFamilyName, style);
+            var fontDescriptorKey = FontDescriptor.ComputeFdKey(fontFamilyName, style);
             try
             {
                 var cache = Globals.Global.FontDescriptorCache;
@@ -97,6 +97,6 @@ namespace PdfSharp.Internal
         /// <summary>
         /// Maps font descriptor key to font descriptor which is currently only an OpenTypeFontDescriptor.
         /// </summary>
-        public readonly Dictionary<string, FontDescriptor> FontDescriptorCache = [];
+        public readonly Dictionary<string, FontDescriptor> FontDescriptorCache = new(StringComparer.InvariantCultureIgnoreCase);
     }
 }

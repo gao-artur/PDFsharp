@@ -2,6 +2,7 @@
 // See the LICENSE file in the solution root for more information.
 
 using System.Text;
+using static System.Text.StringBuilder;
 
 namespace PdfSharp.Pdf.Internal
 {
@@ -61,6 +62,25 @@ namespace PdfSharp.Pdf.Internal
                 // bytes[byteIndex] = (byte)chars[charIndex];
             }
             return charCount;
+        }
+
+        public byte[] GetBytes(StringBuilder stringBuilder)
+        {
+#if NETCOREAPP3_0_OR_GREATER
+            var bytes = new byte[stringBuilder.Length];
+            var i = 0;
+            foreach (var chunk in stringBuilder.GetChunks())
+            {
+                foreach (var ch in chunk.Span)
+                {
+                    bytes[i++] = (byte)ch;
+                }
+            }
+
+            return bytes;
+#else
+            return GetBytes(stringBuilder.ToString());
+#endif
         }
 
         /// <summary>

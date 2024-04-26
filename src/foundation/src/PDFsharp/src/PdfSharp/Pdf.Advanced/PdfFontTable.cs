@@ -106,16 +106,16 @@ namespace PdfSharp.Pdf.Advanced
 
             // #NFM Use gtk here. But the gtk without simulation flags.
 
-            var faceName = glyphTypeface.FontFace.FullFaceName.ToLowerInvariant();
+            var faceName = glyphTypeface.FontFace.FullFaceName;
             var bold = glyphTypeface.IsBold;
             var italic = glyphTypeface.IsItalic;
             var type = fontType == FontType.TrueTypeWinAnsi ? "+A" : "+U";
             var key = bold switch
             {
-                false when !italic => faceName + type,
-                true when !italic => faceName + "/b" + type,
-                false when italic => faceName + "/i" + type,
-                _ => faceName + "/bi" + type
+                false when !italic => $"{faceName}{type}",
+                true when !italic => $"{faceName}/b{type}",
+                false when italic => $"{faceName}/i{type}",
+                _ => $"{faceName}/bi{type}"
             };
             return key;
         }
@@ -123,7 +123,7 @@ namespace PdfSharp.Pdf.Advanced
         /// <summary>
         /// Map from PdfFont selector to PdfFont.
         /// </summary>
-        readonly Dictionary<string, PdfFont> _fonts = [];
+        readonly Dictionary<string, PdfFont> _fonts = new(StringComparer.InvariantCultureIgnoreCase);
 
         public void PrepareForSave()
         {

@@ -2070,10 +2070,7 @@ namespace MigraDoc.Rendering
                 return ch.ToString(); // Return a single character.
 
             // Possibly return more characters.
-            var returnString = new StringBuilder(ch.ToString());
-            while (--count > 0)
-                returnString.Append(ch);
-            return returnString.ToString();
+            return new string(ch, count);
         }
 
         FormatResult FormatSymbol(Character character, Rectangle fittingRect)

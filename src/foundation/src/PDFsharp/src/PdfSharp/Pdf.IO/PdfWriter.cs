@@ -2,6 +2,7 @@
 // See the LICENSE file in the solution root for more information.
 
 using System.Text;
+using PdfSharp.Internal;
 using PdfSharp.Pdf.Advanced;
 using PdfSharp.Pdf.Security;
 using PdfSharp.Pdf.Internal;
@@ -216,7 +217,8 @@ namespace PdfSharp.Pdf.IO
                 {
                     // Special character found, convert whole string to UTF-8.
                     var bytes = Encoding.UTF8.GetBytes(name);
-                    var nameBuilder = new StringBuilder();
+                    using var holder2 = StringBuilderProvider.Acquire();
+                    var nameBuilder = holder2.StringBuilder;
                     foreach (var ch2 in bytes)
                         nameBuilder.Append((char)ch2);
                     name = nameBuilder.ToString();
@@ -224,7 +226,9 @@ namespace PdfSharp.Pdf.IO
                 }
             }
 
-            StringBuilder pdf = new StringBuilder("/");
+            using var holder = StringBuilderProvider.Acquire();
+            StringBuilder pdf = holder.StringBuilder;
+            pdf.Append("/");
             for (int idx = 1; idx < name.Length; idx++)
             {
                 // From Adobe specs: 3.2.4 Name objects
